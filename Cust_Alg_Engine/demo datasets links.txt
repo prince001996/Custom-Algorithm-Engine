@@ -1,0 +1,3 @@
+diabetes - https://www.kaggle.com/uciml/pima-indians-diabetes-database
+
+credit card fraud - https://www.kaggle.com/jacklizhi/creditcard
