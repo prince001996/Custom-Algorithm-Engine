@@ -1,0 +1,123 @@
+<html>
+<head>
+    <title>Results</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+	<style>
+	.conatainer {
+		width:95%;
+		height:95%;
+	}
+			table, th, td {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+	<div class='container'>
+    <h1> The Algorithm used is : {{ Algorithm_used }}</h1>
+    <h3> The columns selected for analyzing are : {{ selected_columns }}</h3>
+	<h3> Time taken : {{ time_taken }}</h3>
+	<br>
+	<hr>
+	<h3> Confusion Matrix :</p><br>
+	<table>
+	<tr>
+		<td rowspan="2" colspan='2'></td>
+		<th colspan='{{ labels|length }}'>Predictions</th>
+	</tr>
+	
+	<tr>
+	{% for each in labels %}
+		<th>{{ each }}</th>
+	{% endfor %}
+	</tr>
+
+	
+	<tbody>
+	<tr>
+	<th rowspan='{{ labels|length }}'>Actual</th>
+	{% for i in range(confusion_matrix|length) %}
+	<th>{{ labels[i] }}</th>
+		{% for col in confusion_matrix[i] %}
+		<td> {{ col }}</td>
+	{% endfor %}
+	</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+	<br>
+	<hr>
+	
+	
+	<h3> Classification Report :</p><br>
+	<table>
+	<tr>
+		<th></th>
+		<th>precsion</th>
+		<th>recall</th>
+		<th>f1-score</th>
+		<th>support</th>
+	</tr>
+  <tbody>
+	{% for col in cr: %}
+	{% if col == 'accuracy' %}
+	<tr>
+      <th>{{ col }}</th>
+      <td colspan='4'>{{ cr['accuracy'] }}</td>
+    </tr>
+	
+	{% else %}
+    <tr>
+      <th>{{ col }}</th>
+      <td>{{ cr[col]['precision'] }}</td>
+      <td>{{ cr[col]['recall'] }}</td>
+	  <td>{{ cr[col]['f1-score'] }}</td>
+	  <td>{{ cr[col]['support'] }}</td>
+    </tr>
+	{% endif %}
+	{% endfor %}
+  </tbody>
+</table>
+<br>
+<hr>
+	
+	<h3> Accuracy : {{ accuracy }}</h3>
+	
+	<br>
+	<hr>
+	<h2> Five classification results : </h2><br>
+	<div class='test' style="overflow-x:auto;">
+		<table>
+		<tr>
+			{% for each in selected_columns %}
+			<th>{{ each }}</th>
+			{% endfor %}
+			<th>label</th>
+			<th>prediction</th>
+		</tr>
+		<tr>
+			{% for i in range(X_test|length) %}
+				{% for column in X_test[i] %}
+				<td>{{ column }}</td>
+				{% endfor %}
+				
+				<td>{{ y_test[i] }}</td>
+
+				<td>{{ pred[i] }}</td>
+		</tr>
+			{% endfor %}
+			
+		</table>
+		</div>
+		<br>
+		<br>
+		<br>
+		<br>
+	
+	
+	</div>
+</body>
+</html>
