@@ -5,8 +5,10 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 		
 		<style>
 			ul {
@@ -15,9 +17,19 @@
 		</style>
     </head>
     <body>
+	
+	<script>
+    function disableButton() {
+        var btn = document.getElementById('upload');
+        btn.disabled = true;
+        btn.innerText = 'Uploading...'
+    }
+</script>
+	
+	
 	<div class="container">
 		<h1>Upload Data</h1>
-		<form id='upload-file' method='POST' action='/upload' enctype='multipart/form-data'>
+		<form id='upload-file' method='POST' action='/upload' onsubmit='disableButton()' enctype='multipart/form-data'>
 		
 		<div class="form-group">
 		<hr>

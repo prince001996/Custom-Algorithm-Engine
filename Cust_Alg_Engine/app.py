@@ -1,3 +1,29 @@
+#imports for solving the ML problem
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler#Normalizing the values
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix, accuracy_score
+#imports for the algorithms
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import tree
+from sklearn.neural_network import MLPClassifier
+#from timer import Timer #self built module to report time
+import time as t
+
+#t=Timer()
+scaler = StandardScaler()
+svc=LinearSVC()
+logmodel = LogisticRegression(solver='liblinear')
+knn = KNeighborsClassifier()
+dtc = tree.DecisionTreeClassifier()
+clf = MLPClassifier(solver='lbfgs', activation='logistic', max_iter=100)
+Algorithm=[knn, logmodel, svc, dtc, clf]
+Algorithm_used=['K Nearest Neighbor', 'Logistic Regression', 'Linear SVM', 'Decision Tree', 'MLP Classifier']
+
 #imports for flask, api, and bowser
 from flask_caching import Cache
 from flask import Flask, flash, request, redirect, url_for, render_template, send_file, jsonify, Response, make_response, after_this_request
@@ -38,24 +64,31 @@ def upload():
     if request.method == 'POST':
         file = request.files['file']
         
+        #if file has not been selected to upload
         if file.filename == '':
             flash('Please select a file')
             return redirect(url_for("index"))
-            
+        
+        #if file has been uploaded and satisfies the supported extension
         if file and allowed_file(file.filename):
             file.save(os.path.join(app.config["UPLOADS"], 'data.csv'))
             
+            #Get the encoding of the file
             with open(os.path.join(app.config["UPLOADS"], 'data.csv')) as f:
                 encoding = (str(f).split('encoding=\'')[1]).split('\'>')[0]
             
-
+            #defining the variables as global
             global data
             global column_names
+            global outcome
+            
             data = pd.read_csv(os.path.join(app.config["UPLOADS"], 'data.csv'), encoding=encoding)
-            column_names = data.columns
-            return render_template("preferences2.html", columns=column_names, data=data.head().as_matrix())
-            #return render_template("preferences.html", columns=column_names, data=data.head().as_matrix())
-       
+            column_names = data.columns[:-1]
+            outcome = data.columns[-1]
+            #render the preferences page to choose the preferences based on the data from dataset
+            return render_template("preferences.html", columns=column_names,outcome=outcome, data=data.head().values)
+        
+        #when file extension is not supported
         flash('File not with correct extension')
         return redirect(url_for("index"))
         
@@ -66,52 +99,32 @@ def set_preferences():
         
         #Reading data from html form from preferences.html
         algorithm = int(request.form["Algorithm"])
-        testsize = float(request.form["testsize"])
-        #columns = [int(x) for x in str(request.form["columns"]).split(',')]#while taking it as numbers from prefernces.html
-        columns = [int(x) for x in request.form.getlist("selected_columns")]#while using checkboxes in preferences2.html
-        label = int(request.form['label'])
+        testsize = (int(request.form["testsize"])/10)
+        columns = [int(x) for x in request.form.getlist("selected_columns")]#while using checkboxes in preferences.html
+        outcome = request.form['outcome']
         
         columns = [column_names[x-1] for x in columns]
         X = data[columns]
-        #X = data[(column_names[x-1] for x in columns)]
-        y = data[column_names[label-1]]
+        y = data[outcome]
         labels = y.unique()
         
         #testsize to be given by user read from form data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=testsize, random_state=101)
         
+        #training the model, predicting values, and get the time in doing so
         s = t.perf_counter()
+        scaler.fit(X_train)
+        X_train = scaler.transform(X_train)
+        X_test = scaler.transform(X_test)
         Algorithm[algorithm].fit(X_train,y_train)
         pred = Algorithm[algorithm].predict(X_test) 
         time_taken = t.perf_counter() - s
         
-        #return 'Algorithm used : '+ str(Algorithm_used[algorithm])+'Columns Selected : '+str(columns)+'\n'+'Confusion Matrix : '+str(confusion_matrix(y_test,pred))+'\n'+'Accuracy Score : '+str(accuracy_score(y_test, pred))+'\n'+'Classification report : '+str(classification_report(y_test, pred))+'\n'+'time_taken : '+time_taken
-        
-        return render_template('results.html', Algorithm_used=str(Algorithm_used[algorithm]), selected_columns=columns, time_taken=time_taken, confusion_matrix=confusion_matrix(y_test,pred), labels = labels, cr=classification_report(y_test, pred, output_dict=True), accuracy=accuracy_score(y_test, pred), X_test=X_test.head().as_matrix(), y_test=y_test.head().as_matrix(), pred=pred[0:5])
+        #show the rsults page with the metrics
+        return render_template('results.html', Algorithm_used=str(Algorithm_used[algorithm]), selected_columns=columns, time_taken=time_taken, confusion_matrix=confusion_matrix(y_test,pred), labels = labels, cr=classification_report(y_test, pred, output_dict=True), accuracy=accuracy_score(y_test, pred), X_test=X_test[:5], y_test=y_test.head().values, pred=pred[0:5])
     
+    #when GET request is made
     return "Wrong Method"
-
-#imports for solving the problem
-import numpy as np
-import pandas as pd
-import chardet#for encoding of a file
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-#from timer import Timer #self built module to report time
-import time as t
-
-#t=Timer()
-svc1=LinearSVC()
-svc2=SVC(gamma='scale')
-logmodel = LogisticRegression(solver='liblinear')
-knn = KNeighborsClassifier()
-Algorithm=[knn, logmodel, svc1]
-Algorithm_used=['K Nearest Neighbor', 'Logistic Regression', 'Linear SVM']
 
 
 app.run()
