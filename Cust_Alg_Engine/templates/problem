@@ -1,0 +1,145 @@
+
+
+
+
+<html lang="en">
+    <head>
+        <title>Preferences</title>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+		<style>
+			table, th, td {
+				border: 1px solid black;
+			}
+
+			/*.checkboxes { border:2px solid #ccc; width:40%; height:30%; overflow-y: scroll;}*/
+		</style>
+    </head>
+    <body>
+	
+	<script>
+    function disableButton() {
+        var btn = document.getElementById('upload');
+        btn.disabled = true;
+        btn.innerText = 'Processing...'
+    }
+</script>
+	
+	
+	
+	<div class="container">
+		<div class='dataset' style="overflow-x:auto;">
+		<table>
+		<tr>
+			{% for each in columns %}
+			<th>{{ each }}</th>
+			{% endfor %}
+			<th>{{ outcome }}</th>
+		</tr>
+		<tr>
+			{% for row in data %}
+				{% for column in row %}
+				<td>{{ column }}</td>
+				{% endfor %}
+		</tr>
+			{% endfor %}
+			
+		</table>
+		</div><br>
+		<hr>
+	
+	
+	
+		<form id='upload-file' method='POST' action='/preferences' onsubmit='disableButton()' enctype='multipart/form-data'>
+		<div class="form-group">
+		
+			<label for="Problem">Select the type of problem : </label><br>
+			<p style='color:red;'>*Please seletc the type of Problem</p>
+
+				<select id="Problem" name='Problem' required>
+				<option value="" disabled selected hidden>Please Choose...</option>
+				  <option {% set choice = 0 %} value="0" >Classification</option>
+				  <option {% set choice = 1 %} value="1">Regression</option>
+				</select><br>
+			<br>
+		
+			<label for="Algorithm">Choose an Algorithm:</label><br>
+
+				<select id="Algorithm" name='Algorithm' required>
+				{% set algorithms = Classification_Algorithm if choice == 0 else Regression_Algorithm %}
+				
+				{% for i in range(algorithm|length) %}
+				  <option value="{{ i }}">{{ algorithm[i] }}</option>
+				{% endfor %}
+				</select><br>
+			<br>
+			
+			
+			<div class='dropdown'>	
+			
+			<label for="columns">Select the columns to be considered for analyzing from dataset:</label><br>
+			<p style='color:red;'>* Select atleast one column, Use Ctrl/Command key to select multiple options</p>
+			
+			<select id="columns" name='selected_columns' multiple required size='5'>
+			{% for i in range(columns|length) %}
+			<option value='{{ i+1 }}'>{{ columns[i] }}</option>
+			{% endfor %}
+			</select>
+			<br>
+			</div>
+			<br>		
+			<br>
+			
+			
+			<!--	
+			<div class='checkboxes'>	
+			
+			<label for="columns">Select the columns to be considered for analyzing from dataset:</label><br>
+			<p style='color:red;'>* Select atleast one column</p>
+			{% for i in range(columns|length) %}
+			
+			<input type="checkbox" id='{{ columns[i] }}' name='selected_columns' value='{{ i+1 }}'>
+			<label for='{{ columns[i] }}'>{{ columns[i] }}</label><br>
+			
+			{% endfor %}	
+				
+			</div>
+			<br>		
+			<br>-->
+			
+			
+				
+			
+			
+			<label for="outcome">Select the Outcome Column:</label><br>	
+			<input type="checkbox" id='outcome' name='outcome' value='{{ outcome }}' required>
+			<label for='outcome'>{{ outcome }}</label><br><br>	
+			
+			
+			<label for="testsize">Enter testsize ratio to be taken from dataset:</label><br>
+			<p style='color:red;'>* The recommended value is 0.3</p>	
+			
+			<label for="testsize">Choose a test size:</label>
+
+				<select id="testsize" name='testsize'>
+				  <option value="1">0.1</option>
+				  <option value="2">0.2</option>
+				  <option value="3" selected>0.3</option>
+				  <option value="4">0.4</option>
+				  <option value="5">0.5</option>
+				</select><br>
+				
+		</div><br>	
+		
+		
+		
+		
+		<button id='upload' class='btn btn-default'>Analyze</button>
+        </form>
+    </div>
+	
+    </body>
+</html>

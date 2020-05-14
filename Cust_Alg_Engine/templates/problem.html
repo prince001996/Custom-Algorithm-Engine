@@ -1,0 +1,42 @@
+<html lang="en">
+    <head>
+        <title>Preferences</title>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+		<style>
+		</style>
+    </head>
+    <body>
+	
+	<script>
+    function disableButton() {
+        var btn = document.getElementById('next');
+        btn.disabled = true;
+    }
+</script>
+	
+	
+	
+	<div class="container">
+		<form id='upload-file' method='POST' action='/ask_preferences' onsubmit='disableButton()' enctype='multipart/form-data'>
+		<div class="form-group">
+	
+		<label for="Problem">Select the type of problem : </label><br>
+			<p style='color:red;'>*Please seletc the type of Problem</p>
+
+				<select id="Problem" name='Problem' required>
+					<option value="" disabled selected hidden>Please Choose...</option>
+				    <option value="0" >Classification</option>
+				    <option value="1">Regression</option>
+				</select><br>
+			<br>
+		</div>
+		<button id='next' class='btn btn-default'>Next</button>
+        </form>
+    </div>
+	
+    </body>
+</html>

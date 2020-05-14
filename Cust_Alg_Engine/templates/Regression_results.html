@@ -1,0 +1,74 @@
+<html>
+<head>
+    <title>Results</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+	<style>
+	.container {
+		width:95%;
+		height:95%;
+	}
+			table, th, td {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+	<div class='container'>
+    <h1> The Algorithm used is : {{ Regression_Algorithm_used }}</h1>
+    <h3> The columns selected for analyzing are : {{ selected_columns }}</h3>
+	<h3> Time taken : {{ time_taken }}</h3>
+	<br>
+	<hr>
+	
+	<h3> Mean Squared Error : {{ mean_squared_error }}</h3>
+	
+	<h3> Max Error : {{ max_error }}</h3>
+	
+	<h3> R2 Score: {{ r2_score }}</h3>
+	
+	<br>
+	<hr>
+	<h2> Five regression results : </h2><br>
+	
+	<div class="table-responsive">
+	<div class='table table-striped'>
+	<div class='test'>
+		<table>
+		<thead>
+		<tr>
+			{% for each in selected_columns %}
+			<th>{{ each }}</th>
+			{% endfor %}
+			<th>outcome</th>
+			<th>prediction</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			{% for i in range(X_test|length) %}
+				{% for column in X_test[i] %}
+				<td>{{ column }}</td>
+				{% endfor %}
+				
+				<td>{{ y_test[i] }}</td>
+
+				<td>{{ pred[i] }}</td>
+		</tr>
+			{% endfor %}
+		</tbody>
+			
+		</table>
+		</div>
+		</div>
+		</div>
+		<br>
+		<br>
+
+	
+	
+	</div>
+</body>
+</html>

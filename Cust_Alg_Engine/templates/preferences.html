@@ -2,39 +2,38 @@
     <head>
         <title>Preferences</title>
 		
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+		
+		<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+		
+		<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+		
+		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+		
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+		
 		<style>
-			table, th, td {
-				border: 1px solid black;
-			}
-
-			/*.checkboxes { border:2px solid #ccc; width:40%; height:30%; overflow-y: scroll;}*/
+		.checkboxes { border:2px solid #ccc; width:50%;
+		height: 160px;
+		overflow-y: scroll; }
 		</style>
-    </head>
-    <body>
-	
-	<script>
-    function disableButton() {
-        var btn = document.getElementById('upload');
-        btn.disabled = true;
-        btn.innerText = 'Processing...'
-    }
-</script>
-	
-	
-	
+    
+	</head>
+    
+	<body>
 	<div class="container">
-		<div class='dataset' style="overflow-x:auto;">
+		<div class="table-responsive">
+		<div class='table table-striped'>
 		<table>
+		<thead>
 		<tr>
 			{% for each in columns %}
 			<th>{{ each }}</th>
 			{% endfor %}
 			<th>{{ outcome }}</th>
 		</tr>
+		</thead>
+		<tbody>
 		<tr>
 			{% for row in data %}
 				{% for column in row %}
@@ -42,87 +41,93 @@
 				{% endfor %}
 		</tr>
 			{% endfor %}
+		</tbody>
 			
 		</table>
-		</div><br>
-		<hr>
+		</div>
+		</div>
 	
 	
 	
-		<form id='upload-file' method='POST' action='/preferences' onsubmit='disableButton()' enctype='multipart/form-data'>
+		<form id='form' method='POST' action='/solve' onsubmit='disableButton()' enctype='multipart/form-data'>
+		
 		<div class="form-group">
-			<label for="Algorithm">Choose an Algorithm:</label><br>
+			
+			<div class="dropdown">
+			<input type="hidden" id="choice" name="choice" value="{{ choice }}" readonly>
+		
+			<label for="Algorithm" required><b>Choose an Algorithm:</b></label><br>
 
 				<select id="Algorithm" name='Algorithm' required>
-				  <option value="0">KNN</option>
-				  <option value="1" selected>Logistic</option>
-				  <option value="2">Linear SVM</option>
-				  <option value="3">Decision Tree</option>
-				  <option value="4">MLP Classifier</option>
+				  <option value="" disabled selected hidden>Please Choose...</option>
+				{% for i in range(algorithm|length) %}
+				  <option value="{{ i }}">{{ algorithm[i] }}</option>
+				{% endfor %}
 				</select><br>
 			<br>
 			
+			<p style='color:red;'>* Select atleast one column from categorical or numeriacl</p>
+			<p><b>Select the Categorical columns to be considered to analyze : </b></p>
 			
-			<div class='dropdown'>	
+			<div class='checkboxes'>
 			
-			<label for="columns">Select the columns to be considered for analyzing from dataset:</label><br>
-			<p style='color:red;'>* Select atleast one column, Use Ctrl/Command key to select multiple options</p>
+			<label>
+			<input type="checkbox" class='features' onclick="toggle1(this);">Select All</label><br>
 			
-			<select id="columns" name='selected_columns' multiple required size='5'>
-			{% for i in range(columns|length) %}
-			<option value='{{ i+1 }}'>{{ columns[i] }}</option>
+			{% for i in range(default_categorical_columns|length) %}
+			<label>
+			<input type="checkbox" class='features' name='selected_categorical_columns' value='{{ default_categorical_columns[i] }}' checked>{{ default_categorical_columns[i] }}
+			</label><br>
 			{% endfor %}
-			</select>
-			<br>
-			</div>
-			<br>		
-			<br>
 			
-			
-			<!--	
-			<div class='checkboxes'>	
-			
-			<label for="columns">Select the columns to be considered for analyzing from dataset:</label><br>
-			<p style='color:red;'>* Select atleast one column</p>
-			{% for i in range(columns|length) %}
-			
-			<input type="checkbox" id='{{ columns[i] }}' name='selected_columns' value='{{ i+1 }}'>
-			<label for='{{ columns[i] }}'>{{ columns[i] }}</label><br>
-			
+			{% for i in range(default_numerical_columns|length) %}
+			<label>
+			<input type="checkbox" class='features' name='selected_categorical_columns' value='{{ default_numerical_columns[i] }}'>{{ default_numerical_columns[i] }}</label><br>
 			{% endfor %}	
 				
 			</div>
-			<br>		
-			<br>-->
+			<br>
 			
+			<p><b>Select the numerical columns to be considered to analyze: </b></p>
+
+			<div class='checkboxes'>
 			
+			<label>
+			<input type="checkbox" class='features' onclick="toggle2(this);">Select All</label><br>
+			
+			{% for i in range(default_numerical_columns|length) %}
+			<label>
+			<input type="checkbox" class='features' name='selected_numerical_columns' value='{{ default_numerical_columns[i] }}'>{{ default_numerical_columns[i] }}</label><br>
+			{% endfor %}	
 				
+			</div>
+			<br>
+			
+			<label for="outcome"><b>Select the Outcome Column:</b></label><br>	
+			<input type="checkbox" id='outcome' name='outcome' value='{{ outcome }}' checked onclick="return false;" onkeydown="e = e || window.event; if(e.keyCode !== 9) return false;">
+			<label for='outcome'>{{ outcome }}</label><br><br>
 			
 			
-			<label for="outcome">Select the Outcome Column:</label><br>	
-			<input type="checkbox" id='outcome' name='outcome' value='{{ outcome }}' required>
-			<label for='outcome'>{{ outcome }}</label><br><br>	
-			
-			
-			<label for="testsize">Enter testsize ratio to be taken from dataset:</label><br>
-			<p style='color:red;'>* The recommended value is 0.3</p>	
-			
+			<p><b>Choose testsize ratio to be taken from dataset:</b></p>
+			<p style='color:red;'>* The recommended value is 0.3</p>		
 			<label for="testsize">Choose a test size:</label>
 
-				<select id="testsize" name='testsize'>
+				<select id="testsize" name='testsize' required>
+				  <option value="" disabled selected hidden>Please Choose...</option>
 				  <option value="1">0.1</option>
 				  <option value="2">0.2</option>
-				  <option value="3" selected>0.3</option>
+				  <option value="3">0.3</option>
 				  <option value="4">0.4</option>
 				  <option value="5">0.5</option>
 				</select><br>
-				
-		</div><br>	
+		</div>
+			<br>
+			<br>
 		
 		
 		
 		
-		<button id='upload' class='btn btn-default'>Analyze</button>
+		<button id='upload' type='submit' class='btn btn-Success'>Start</button>
         </form>
     </div>
 	
